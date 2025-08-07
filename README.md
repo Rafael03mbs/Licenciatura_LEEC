@@ -1,6 +1,6 @@
 # Portfólio de Engenharia | Projetos da Licenciatura (FCT NOVA)
 
-Bem-vindo ao meu portfólio! Este repositório agrega uma coleção dos meus projetos académicos mais significativos desenvolvidos durante a Licenciatura em Engenharia Eletrotécnica e de Computadores.
+Este repositório agrega uma coleção dos meus projetos académicos mais significativos desenvolvidos durante a Licenciatura em Engenharia Eletrotécnica e de Computadores.
 
 Cada projeto demonstra a aplicação prática de conceitos avançados em áreas como **Inteligência Artificial (Programação Lógica), Controlo em Tempo Real, Modelação Formal e Engenharia de Software**.
 
