@@ -18,4 +18,4 @@ Clique no nome de um projeto para explorar a sua descrição técnica detalhada.
 
 *   **[Modelação de Sistemas com Redes de Petri](./sistemas_tempo_real/modelacao_de_sistemas_redes_petri/):** Modelação formal e controlo de um separador de frutas usando HPSim e Python. **(Classificação: 18/20)**
 
-*   **[Simulação de Conveyor de Frutas (Python)](./conveyor_frutas_python/):** Simulação orientada a objetos de um tapete rolante industrial para deteção e separação de frutas.
+*   **[Simulação de Conveyor de Frutas (Python)](./sistemas_tempo_real/modelacao_de_sistemas_redes_petri/conveyor_frutas_python/):** Simulação orientada a objetos de um tapete rolante industrial para deteção e separação de frutas.
