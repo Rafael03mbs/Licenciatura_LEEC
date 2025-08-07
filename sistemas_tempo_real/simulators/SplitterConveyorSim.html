@@ -1,0 +1,1940 @@
+﻿<html lang="en" xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+<head>
+    <title>Conveyor Belt-based Line</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        body {
+            color: #61443e;
+            font-family: Monospace;
+            font-size: 13px;
+            text-align: center;
+            background-color: #bfd1e5;
+            margin: 0px;
+            overflow: hidden;
+        }
+
+        a {
+            color: #a06851;
+        }
+
+        .nopadding {
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .press_button {
+            // margin: 25px;
+            // height: 30px;
+            // width: 100px;
+            border: 1px solid #ccc;
+            // line-height: 30px;
+        }
+
+            .press_button:active {
+                background: red;
+            }
+
+        /*MODAL FORM */
+        /* The Modal (background) */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 30px;
+            /*width: 100%; */ /* Full width */
+            /*height: 100%; */ /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+
+        /* Modal Content/Box */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 2% 2% 2% 2%; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+        }
+        /* The Close Button */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+            .close:hover,
+            .close:focus {
+                color: black;
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+      
+
+
+    </style>
+
+    <script src="js/three.js"></script>
+    <script src="js/Projector.js"></script>
+    <script src="js/ammo.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/DragControls.js"></script>
+    <script src="js/Detector.js"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/ConvexObjectBreaker.js"></script>
+    <script src="js/QuickHull.js"></script>
+    <script src="js/ConvexGeometry.js"></script>
+    <script src="js/jquery-3.2.1.min.js"></script>
+    <script src="js/hierarchy.js"></script>
+    <script src="js/w3.js"></script>
+
+
+<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:MediaServiceImageTags msdt:dt="string"></mso:MediaServiceImageTags>
+<mso:lcf76f155ced4ddcb4097134ff3c332f msdt:dt="string"></mso:lcf76f155ced4ddcb4097134ff3c332f>
+<mso:TaxCatchAll msdt:dt="string"></mso:TaxCatchAll>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+<body>
+
+
+    <div>
+
+        <button id="myBtn" style="background-color:#f44336;">MANUAL</button>
+        <input type="button" value="Package 1" id="buttonPieceA">
+        <input type="button" value="Package 2" id="buttonPieceB">
+        <input type="button" value="Package 3" id="buttonPieceC">
+        <input type="button" value="Delete Pieces" id="deleteAll">
+
+
+        <input type="button" value="Dock 1" id="buttonStation1" class="press_button">
+        <input type="button" value="Dock 2" id="buttonStation2" class="press_button">
+        <input type="button" value="Dock End" id="buttonStation3" class="press_button">
+        <input type="button" value="LED" id="buttonLED" class="press_button">
+
+
+        <br>
+
+        P0:<input type="text" id="P0" value="0" size="7">
+        P1:<input type="text" id="P1" value="0" size="7">
+        P2:<input type="text" id="P2" value="0" size="7">
+
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+
+                <input type="button" value="Cylinder Start In" id="buttonCyllinderA_I">
+                <input type="button" value="Cylinder Start Out" id="buttonCyllinderA_O">
+                <input type="button" value="Cylinder 1 In" id="buttonCyllinderB_I">
+                <input type="button" value="Cylinder 1 Out" id="buttonCyllinderB_O">
+                <input type="button" value="Cylinder 2 In" id="buttonCyllinderC_I">
+                <input type="button" value="Cylinder 2 Out" id="buttonCyllinderC_O">
+                <input type="button" value="Conveyor" id="buttonConveyor">
+                <input type="button" value="STOP ALL" id="buttonSTOP_ALL">
+
+
+                <span class="close">&times;</span>
+            </div>
+
+        </div>
+
+
+
+
+        <br>
+        CONVEYOR SPEED:<input type="text" id="SPEED" value="1.0" size="1">
+        <input type="range" id="speedRange" value="1.0" min="0.1" max="5.0" step="0.1">
+        CYLLINDER A SPEED:<input type="text" id="A_SPEED" value="1.0" size="1">
+        <input type="range" id="speedRangeA" value="1.0" min="0.1" max="5.0" step="0.1">
+
+        CYLLINDER B SPEED:<input type="text" id="B_SPEED" value="1.0" size="1">
+        <input type="range" id="speedRangeB" value="1.0" min="0.1" max="5.0" step="0.1">
+
+        CYLLINDER C SPEED:<input type="text" id="C_SPEED" value="1.0" size="1">
+        <input type="range" id="speedRangeC" value="1.0" min="0.1" max="5.0" step="0.1">
+        <!--apagar
+    P3:<input type="text" id="P3" value="0" size="7">
+    P4:<input type="text" id="P4" value="0" size="7">
+    P5:<input type="text" id="P5" value="0" size="7">
+    -->
+
+
+    </div>
+    <div id="three_container"><br /><br /><br /><br /><br />Loading...</div>
+
+
+    <script>
+
+        //MODAL FORM
+        // Get the modal
+        //MODAL FORM
+        // Get the modal
+        var modal = document.getElementById('myModal');
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks on the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "block";
+            is_on_manual = true;
+
+            setTimeout(function () {
+                //  console.log("escreve passado 5 segundos");
+                save_port_2 = PORTS[2];
+                PORTS[2] = 0;
+            }, 10);
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+            //console.log("span clicked");
+            is_on_manual = false;
+            smaphore_worker = 1;  // might become zero when c program is closed
+            modal.style.display = "none";
+            PORTS[2] = save_port_2;
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+
+
+        // Detects webgl
+        if (!Detector.webgl) {
+            Detector.addGetWebGLMessage();
+            document.getElementById('three_container').innerHTML = "";
+        }
+
+        // - Global variables -
+
+        // Graphics variables
+        var container, stats;
+        var camera, controls, scene, renderer;
+        var textureLoader;
+        var clock = new THREE.Clock();
+
+        //raycaster
+        var mouse = new THREE.Vector2(), INTERSECTED;
+        var projector = new THREE.Projector();
+        var raycaster = new THREE.Raycaster();
+        var vector = new THREE.Vector3();
+        var vector1 = new THREE.Vector3();
+        var vector2 = new THREE.Vector3();
+
+        var mouseVector = new THREE.Vector2();
+        var containerWidth, containerHeight;
+
+
+
+        var mouseCoords = new THREE.Vector2();
+        var ballMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
+
+
+
+   
+
+        // Physics variables
+        var gravityConstant = 100;
+        var collisionConfiguration;
+        var dispatcher;
+        var broadphase;
+        var solver;
+        var physicsWorld;
+        var margin = 0.05;
+
+        var convexBreaker = new THREE.ConvexObjectBreaker();
+
+        // Rigid bodies include all movable objects
+        var rigidBodies = [];
+        var threeObjects = [];
+
+
+        //drag ??
+        var objects = [];
+
+
+        var objectsToDrag = [];
+
+
+        var pos = new THREE.Vector3();
+        var quat = new THREE.Quaternion();
+        var transformAux1 = new Ammo.btTransform();
+        var tempBtVector = new Ammo.btVector3(0, 0, 0);
+
+        var time = 0;
+
+
+
+
+        var impactPoint = new THREE.Vector3();
+        var impactNormal = new THREE.Vector3();
+
+
+        //kit behaviour
+        var delta_x = 0;
+        var delta_x1 = 0;
+        var delta_y = 0;
+        var delta_z = 0;
+        var delta_z1 = 0;
+        var delta_z2 = 0;
+        var delta_left_station = 0;
+        var delta_right_station = 0;
+        var slowMotionConstant = 1.0;
+        var buttonStation1Pressed = 0;
+        var buttonStation2Pressed = 0;
+        var buttonStation3Pressed = 0;
+
+        var previous_delta_z = 0;
+
+        var SPEED = 1;
+        var A_SPEED = 1;
+        var B_SPEED = 1;
+        var C_SPEED = 1;
+
+        var TOLERANCE = 0.0;
+
+        var palleteCount = 0;
+        var palletes = [];
+
+        var PORTS = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var save_port_4 = 0;
+        var save_port_5 = 0;
+        var the_worker;
+        var smaphore_worker = 1;
+        var is_on_manual = false;
+        var sound1;
+        var left_station_sensor_x, left_station_sensor_y, left_station_sensor_z;
+
+
+        var left_station_rolos = [];
+        var right_station_rolos = [];
+
+        var is_on_manual = false;
+
+
+        // - Main code -
+        $(window).on("load", function () {
+            init();
+            animate();
+            ///AQUI  move_delta_linear(threeObjects["tower"], 100, 0, 0);
+        });
+
+        // - Functions -
+
+        function init() {
+
+            initGraphics();
+
+            initPhysics();
+
+            createObjects();
+
+
+            //initRaycasterIdentification();
+            initDrag();
+
+            //initInput();
+
+            initRaycasterIdentification();
+
+            startWorker();
+
+        }
+
+
+        function initDrag() {
+            //drag controlls
+            var dragControls = new THREE.DragControls(objectsToDrag, camera, renderer.domElement);
+            dragControls.addEventListener('dragstart', function (event) {
+                controls.enabled = false;
+            });
+            dragControls.addEventListener('dragend', function (event) {
+                controls.enabled = true;
+            });
+            /*var info = document.createElement( 'div' );
+             info.style.position = 'absolute';
+             info.style.top = '10px';
+             info.style.width = '100%';
+             info.style.textAlign = 'center';
+             info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - draggable cubes';
+             container.appendChild( info );
+             */
+        }
+
+        function initGraphics() {
+
+            container = document.getElementById('three_container');
+
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.2, 2000);
+            //camera = new THREE.PerspectiveCamera(60, $("#three_container").width() / $("#three_container").height(), 0.2, 2000);
+
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xbfd1e5);
+
+            camera.position.set(500, 600, 600);
+
+            // permitir que rato so funcione no div com o threejs
+
+            controls = new THREE.OrbitControls(camera, container);
+            controls.target.set(0, 2, 0);
+            controls.update();
+
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+
+            renderer.shadowMap.enabled = true;
+
+            textureLoader = new THREE.TextureLoader();
+
+            var ambientLight = new THREE.AmbientLight(0x707070);
+            scene.add(ambientLight);
+
+            var light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(-10, 18, 5);
+            light.castShadow = true;
+            var d = 14;
+            light.shadow.camera.left = -d;
+            light.shadow.camera.right = d;
+            light.shadow.camera.top = d;
+            light.shadow.camera.bottom = -d;
+
+            light.shadow.camera.near = 2;
+            light.shadow.camera.far = 50;
+
+            light.shadow.mapSize.x = 1024;
+            light.shadow.mapSize.y = 1024;
+
+            scene.add(light);
+
+
+            container.innerHTML = "";
+
+            container.appendChild(renderer.domElement);
+
+
+            //document.addEventListener('mousemove', onDocumentMouseMove, false);
+            window.addEventListener('resize', onWindowResize, false);
+            //renderer.domElement.addEventListener('mousedown', onCanvasMouseDown, false);
+            var listener = new THREE.AudioListener();
+            var audioLoader = new THREE.AudioLoader();
+            sound1 = new THREE.PositionalAudio(listener);
+            audioLoader.load('sounds/Crash.ogg', function (buffer) {
+                sound1.setBuffer(buffer);
+                sound1.setRefDistance(20);
+
+            });
+
+        }
+
+        function initPhysics() {
+
+            // Physics configuration
+            collisionConfiguration = new Ammo.btDefaultCollisionConfiguration();
+            dispatcher = new Ammo.btCollisionDispatcher(collisionConfiguration);
+            broadphase = new Ammo.btDbvtBroadphase();
+            solver = new Ammo.btSequentialImpulseConstraintSolver();
+            physicsWorld = new Ammo.btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfiguration);
+            physicsWorld.setGravity(new Ammo.btVector3(0, -gravityConstant, 0));
+
+        }
+
+
+
+        function createObjects() {
+
+            // Ground
+            pos.set(250, -0.5, 100);
+            quat.set(0, 0, 0, 1);
+            //    function createParalellepipedWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+            var ground = createParalellepipedWithPhysics(1100, 30, 540, 0, pos, quat, new THREE.MeshPhongMaterial({ color: 0xFFFFFF }));
+            ground.receiveShadow = true;
+            textureLoader.load("textures/grid.png", function (texture) {
+                texture.wrapS = THREE.RepeatWrapping;
+                texture.wrapT = THREE.RepeatWrapping;
+                texture.repeat.set(40, 40);
+                ground.material.map = texture;
+                ground.material.needsUpdate = true;
+            });
+            var groundAxis = new THREE.AxisHelper(200);
+            groundAxis.rotation.x = -Math.PI / 2;  //Rotation of axis
+            groundAxis.position.x = -550;
+            groundAxis.position.y = 15;
+            groundAxis.position.z = 270;
+            ground.add(groundAxis);
+            scene.add(ground);
+
+
+            obj = createBox("base_1", 570, 55, 170, 0, 0, 0, 160, 60, 120, 0, "black", true);
+            scene.add(obj);
+
+
+
+            obj = createBox("base_tapete1", 360, 105, 170, 0, 0, 0, 580, 40, 120, 0, "grey", true);
+            scene.add(obj);
+
+            obj = createBox("base_tapete2", -10, 75, 170, 0, 0, 0, 160, 100, 60, 0, "darkslategrey", true);
+            scene.add(obj);
+
+
+            obj = createBox("reciclagem", 710, 67.25, 170, 0, 0, -3.14 / 6, 165, 40, 120, 0, "grey", true);
+            scene.add(obj);
+
+            obj = createBox("reciclagem_cob1", 720.225, 86.6175, 125, 0, 0, -3.14 / 6, 165, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("reciclagem_cob1", 720.225, 86.6175, 215, 0, 0, -3.14 / 6, 165, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+            obj = createBox("top_base_tapete1", 360, 127.5, 125, 0, 0, 0, 580, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+
+            obj = createBox("top_base_tapete21", 100, 127.5, 215, 0, 0, 0, 60, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("top_base_tapete22", 310, 127.5, 215, 0, 0, 0, 120, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("top_base_tapete23", 570, 127.5, 215, 0, 0, 0, 160, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+
+            obj = createCylinder("cilindro_lim1", 480, 131, 215, 0, 0, 0, 10, 13, 0, "darkslategrey", true);
+            scene.add(obj);
+
+            obj = createCylinder("cilindro_lim2", 380, 131, 215, 0, 0, 0, 10, 13, 0, "darkslategrey", true);
+            scene.add(obj);
+
+
+            obj71 = createCylinder("station1sensor", 480, 127.5, 320, 0, 0, 0, 5, 10, 0, "darkblue", true);
+            scene.add(obj71);
+
+
+
+            obj = createCylinder("cilindro_lim3", 240, 131, 215, 0, 0, 0, 10, 13, 0, "darkslategrey", true);
+            scene.add(obj);
+
+            obj = createCylinder("cilindro_lim4", 140, 131, 215, 0, 0, 0, 10, 13, 0, "darkslategrey", true);
+            scene.add(obj);
+
+
+
+            obj72 = createCylinder("station2sensor", 240, 127.5, 320, 0, 0, 0, 5, 10, 0, "darkblue", true);
+            scene.add(obj72);
+
+
+            obj73 = createCylinder("station3sensor", 640, 135, 215, 0, 0, 0, 5, 10, 0, "darkblue", true);
+            scene.add(obj73);
+
+
+            obj = createBox("tapete_chao1", -10, 20, 170, 0, 0, 0, 160, 10, 120, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("tapete_chao2", 570, 20, 170, 0, 0, 0, 160, 10, 120, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+            obj = createBox("parede_queue1", -10, 65, 125, 0, 0, 0, 100, 80, 30, 0, "black", true);
+            scene.add(obj);
+
+            obj = createBox("parede_queue2", -10, 65, 215, 0, 0, 0, 100, 80, 30, 0, "black", true);
+            scene.add(obj);
+
+            obj = createBox("parede_queue3", -10, 240, 125, 0, 0, 0, 100, 30, 30, 0, "black", true);
+            scene.add(obj);
+
+            obj = createBox("parede_queue4", -10, 240, 215, 0, 0, 0, 100, 30, 30, 0, "black", true);
+            scene.add(obj);
+
+
+            obj = createBox("parede_queue5", -75, 240, 170, 0, 0, 0, 30, 30, 60, 0, "black", true);
+            scene.add(obj);
+
+
+            obj = createBox("parede_fina1", -10, 192.5, 137.5, 0, 0, 0, 100, 45, 5, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("parede_fina2", -10, 192.5, 202.5, 0, 0, 0, 100, 45, 5, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("parede_fina3", -10, 137.5, 137.5, 0, 0, 0, 100, 45, 5, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("parede_fina4", -10, 137.5, 202.5, 0, 0, 0, 100, 45, 5, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+            obj = createBox("torre_queue1", -75, 140, 125, 0, 0, 0, 30, 230, 30, 0, "gray", true);
+            scene.add(obj);
+
+            obj = createBox("torre_queue2", -75, 140, 215, 0, 0, 0, 30, 230, 30, 0, "gray", true);
+            scene.add(obj);
+
+
+            obj = createBox("torre_cobertura_lat1", -75, 175, 142.5, 0, 0, 0, 30, 100, 5, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+            obj = createBox("torre_queue3", 55, 140, 125, 0, 0, 0, 30, 230, 30, 0, "gray", true);
+            scene.add(obj);
+
+            obj = createBox("torre_queue4", 55, 140, 215, 0, 0, 0, 30, 230, 30, 0, "gray", true);
+            scene.add(obj);
+
+
+            obj = createBox("torre_cobertura_lat2", -75, 175, 197.5, 0, 0, 0, 30, 100, 5, 0, "maroon", true);
+            scene.add(obj);
+
+
+            obj = createBox("cobertura1", -10, 257.5, 125, 0, 0, 0, 160, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("cobertura2", -10, 257.5, 215, 0, 0, 0, 160, 5, 30, 0, "maroon", true);
+            scene.add(obj);
+
+            obj = createBox("cobertura3", -70, 256.25, 170, 0, 0, 0, 40, 2.5, 60, 0, "maroon", true);
+            scene.add(obj);
+
+
+
+
+            obj = createBox("base_tapete3", 430, 105, -10, 0, 0, 0, 120, 40, 240, 0, "red", true);
+            scene.add(obj);
+
+            obj = createBox("base_tapete4", 190, 105, -10, 0, 0, 0, 120, 40, 240, 0, "red", true);
+            scene.add(obj);
+
+            /////////////////////////////////////////////Cilindros//////////////////////////////////////////////////////
+
+            obj = createBox("base_garra1", 430, 132.5, -10, 0, 0, 0, 60, 15, 60, 0, "black", true);
+            scene.add(obj);
+
+            obj = createBox("base_garra2", 190, 132.5, -10, 0, 0, 0, 60, 15, 60, 0, "black", true);
+            scene.add(obj);
+
+
+
+            obj80 = createBox("base_garra_sensor11", 410, 150, -90, 0, 0, 0, 10, 50, 10, 0, "darkblue", true);
+            scene.add(obj80);
+
+
+            obj81 = createBox("base_garra_sensor12", 410, 157.5, 15, 0, 0, 0, 10, 35, 10, 0, "darkblue", true);
+            scene.add(obj81);
+
+            obj50 = createBox("base_garra_sensor1", 430, 171, -100, 0, 0, 0, 30, 2, 10, 0, "darkorange", true);
+            scene.add(obj50);
+
+
+
+
+            obj82 = createBox("base_garra_sensor21", 170, 150, -90, 0, 0, 0, 10, 50, 10, 0, "darkblue", true);
+            scene.add(obj82);
+
+
+            obj83 = createBox("base_garra_sensor22", 170, 157.5, 15, 0, 0, 0, 10, 35, 10, 0, "darkblue", true);
+            scene.add(obj83);
+
+            obj51 = createBox("base_garra_sensor2", 190, 171, -100, 0, 0, 0, 30, 2, 10, 0, "darkorange", true);
+            scene.add(obj51);
+
+
+
+            obj1 = createBox("tubo_garra1", 430, 155, -20, 0, 0, 0, 30, 30, 280, 0, "grey", true);
+            scene.add(obj1);
+
+            obj2 = createBox("tubo_garra2", 190, 155, -20, 0, 0, 0, 30, 30, 280, 0, "grey", true);
+            scene.add(obj2);
+
+
+            obj3 = createBox("parte_tras_tubo_garra1", 430, 155, -165, 0, 0, 0, 30, 30, 10, 0, "maroon", true);
+            scene.add(obj3);
+
+            obj4 = createBox("parte_tras_tubo_garra2", 190, 155, -165, 0, 0, 0, 30, 30, 10, 0, "maroon", true);
+            scene.add(obj4);
+
+
+
+            obj5 = createBox("garra1", 430, 185, 158.75, 0, 0, 0, 40, 30, 37.5, 0, "maroon", true);
+            scene.add(obj5);
+
+            obj6 = createBox("garra12", 430, 185, 102.5, 0, 0, 0, 30, 30, 75, 0, "black", true);
+            scene.add(obj6);
+
+            obj7 = createBox("garra13", 412.5, 185, 121.25, 0, 0, 0, 5, 30, 37.5, 0, "maroon", true);
+            scene.add(obj7);
+
+            obj8 = createBox("garra14", 447.5, 185, 121.25, 0, 0, 0, 5, 30, 37.5, 0, "maroon", true);
+            scene.add(obj8);
+
+
+            obj9 = createBox("garra2", 190, 185, 158.75, 0, 0, 0, 40, 30, 37.5, 0, "maroon", true);
+            scene.add(obj9);
+
+            obj10 = createBox("garra22", 190, 185, 102.5, 0, 0, 0, 30, 30, 75, 0, "black", true);
+            scene.add(obj10);
+
+            obj11 = createBox("garra23", 172.5, 185, 121.25, 0, 0, 0, 5, 30, 37.5, 0, "maroon", true);
+            scene.add(obj11);
+
+            obj12 = createBox("garra24", 207.5, 185, 121.25, 0, 0, 0, 5, 30, 37.5, 0, "maroon", true);
+            scene.add(obj12);
+
+
+
+            obj13 = createBox("parafuso1parte1", 190, 203.5, 160, 0, 0, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj13);
+
+            obj14 = createBox("parafuso1parte2", 190, 203.5, 160, 0, (2 * 3.14) / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj14);
+
+            obj15 = createBox("parafuso1parte3", 190, 203.5, 160, 0, 3.14 / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj15);
+
+
+            obj16 = createBox("parafuso2parte1", 190, 166.5, 160, 0, 0, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj16);
+
+            obj17 = createBox("parafuso2parte2", 190, 166.5, 160, 0, (2 * 3.14) / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj17);
+
+            obj18 = createBox("parafuso2parte3", 190, 166.5, 160, 0, 3.14 / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj18);
+
+
+            obj19 = createCylinder("garra_sensor1", 190, 156.5, 160, 0, 0, 0, 5, 13, 0, "darkorange", true);
+            scene.add(obj19);
+
+
+
+            obj20 = createBox("parafuso3parte1", 430, 203.5, 160, 0, 0, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj20);
+
+            obj21 = createBox("parafuso3parte2", 430, 203.5, 160, 0, (2 * 3.14) / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj21);
+
+            obj22 = createBox("parafuso3parte3", 430, 203.5, 160, 0, 3.14 / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj22);
+
+
+            obj23 = createBox("parafuso4parte1", 430, 166.5, 160, 0, 0, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj23);
+
+            obj24 = createBox("parafuso4parte2", 430, 166.5, 160, 0, (2 * 3.14) / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj24);
+
+            obj25 = createBox("parafuso4parte3", 430, 166.5, 160, 0, 3.14 / 3, 0, 25, 7, 14.4, 0, "darkslategrey", true);
+            scene.add(obj25);
+
+
+            obj26 = createCylinder("garra_sensor2", 430, 156.5, 160, 0, 0, 0, 5, 13, 0, "darkorange", true);
+            scene.add(obj26);
+
+
+
+            obj27 = createBox("sensor_tipo_peca1", 85, 165, 132.5, 0, 0, 0, 30, 30, 15, 0, "black", true);
+            scene.add(obj27);
+
+            obj28 = createBox("sensor_tipo_peca11", 101.25, 165, 132.5, 0, 0, 0, 2.5, 30, 15, 0, "maroon", true);
+            scene.add(obj28);
+
+            obj29 = createBox("sensor_tipo_peca12", 55, 165, 105, 0, 0, 0, 10, 60, 10, 0, "darkslategrey", true);
+            scene.add(obj29);
+
+            obj30 = createBox("sensor_tipo_peca13", 45, 165, 105, 0, 0, 0, 10, 30, 10, 0, "maroon", true);
+            scene.add(obj30);
+
+            obj31 = createBox("sensor_tipo_peca14", 65, 165, 105, 0, 0, 0, 10, 30, 10, 0, "maroon", true);
+            scene.add(obj31);
+
+
+            obj32 = createBox("sensor_tipo_peca2", 85, 165, 207.5, 0, 0, 0, 30, 30, 15, 0, "black", true);
+            scene.add(obj32);
+
+            obj33 = createBox("sensor_tipo_peca22", 101.25, 165, 207.5, 0, 0, 0, 2.5, 30, 15, 0, "maroon", true);
+            scene.add(obj33);
+
+            obj34 = createBox("sensor_tipo_peca22", 55, 165, 235, 0, 0, 0, 10, 60, 10, 0, "darkslategrey", true);
+            scene.add(obj34);
+
+            obj35 = createBox("sensor_tipo_peca23", 45, 165, 235, 0, 0, 0, 10, 30, 10, 0, "maroon", true);
+            scene.add(obj35);
+
+            obj36 = createBox("sensor_tipo_peca24", 65, 165, 235, 0, 0, 0, 10, 30, 10, 0, "maroon", true);
+            scene.add(obj36);
+
+
+            add_child(obj2, obj4);
+            add_child(obj2, obj9);
+            add_child(obj2, obj10);
+            add_child(obj2, obj11);
+            add_child(obj2, obj12);
+            add_child(obj2, obj13);
+            add_child(obj2, obj14);
+            add_child(obj2, obj15);
+            add_child(obj2, obj16);
+            add_child(obj2, obj17);
+            add_child(obj2, obj18);
+            add_child(obj2, obj19);
+            add_child(obj2, obj51);
+
+            add_child(obj1, obj3);
+            add_child(obj1, obj5);
+            add_child(obj1, obj6);
+            add_child(obj1, obj7);
+            add_child(obj1, obj8);
+            add_child(obj1, obj20);
+            add_child(obj1, obj21);
+            add_child(obj1, obj22);
+            add_child(obj1, obj23);
+            add_child(obj1, obj24);
+            add_child(obj1, obj25);
+            add_child(obj1, obj26);
+            add_child(obj1, obj50);
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+            obj = createBox("base_tapete_recebe1", 430, 105, 280, 0, 0, 0, 120, 40, 100, 0, "red", true);
+            scene.add(obj);
+
+            obj = createBox("base_tapete_recebe2", 190, 105, 280, 0, 0, 0, 120, 40, 100, 0, "red", true);
+            scene.add(obj);
+
+
+            for (i = 0; i < 6; i++) {
+                obj = createBox("tapete2" + i, 385 + i * 18, 126, 280, 0, 0, 0, 16, 0.5, 100, 0, "black", true);
+                scene.add(obj);
+            }
+
+            for (i = 0; i < 6; i++) {
+                obj = createBox("tapete3" + i, 145 + i * 18, 126, 280, 0, 0, 0, 16, 0.5, 100, 0, "black", true);
+                scene.add(obj);
+            }
+
+
+
+            for (i = 0; i < 116; i++) {
+                obj = createBox("tapete1" + i, 72 + i * 5, 126, 170, 0, 0, 0, 4, .5, 60, 1, "black", true);
+                obj.userData.physicsBody.setFriction(1);
+                scene.add(obj);
+                left_station_rolos.push(obj);
+            }
+
+
+
+
+            obj = createBox("base_ponta", -150, 105, 170, 0, 0, 0, 120, 40, 60, 0, "darkslategrey", true);
+            scene.add(obj);
+
+
+            obj = createBox("base_ponta_cobertura_baixo", -150, 82.5, 170, 0, 0, 0, 120, 5, 60, 0, "black", true);
+            scene.add(obj);
+
+
+            obj = createBox("base_ponta_apoio1", -140, 125, 210, 0, 0, 0, 20, 80, 20, 0, "grey", true);
+            scene.add(obj);
+
+            obj = createBox("base_ponta_apoio11", -140, 82.5, 210, 0, 0, 0, 20, 5, 20, 0, "black", true);
+            scene.add(obj);
+
+            obj = createBox("base_ponta_apoio2", -180, 125, 210, 0, 0, 0, 20, 80, 20, 0, "grey", true);
+            scene.add(obj);
+
+            obj = createBox("base_ponta_apoio21", -180, 82.5, 210, 0, 0, 0, 20, 5, 20, 0, "black", true);
+            scene.add(obj);
+
+
+            obj63 = createBox("base_ponta_quadrado1_braco", -195, 145, 200, 0, 0, 0, 10, 40, 40, 0, "maroon", true);
+            scene.add(obj63);
+
+            //obj62 = createBox("base_ponta_quadrado2_braco", -155, 145, 200, 0, 0, 0, 10, 40, 40, 0, "maroon", true);
+            //scene.add(obj62);
+
+            obj71 = createBox("quadrado_da_garra", -160, 155, 210, 0, 0, 0, 20, 20, 20, 0, "grey", true);
+            scene.add(obj71);
+
+            obj72 = createBox("barra_cinzenta_garra", -260, 155, 210, 0, 0, 0, 120, 20, 20, 0, "grey", true);
+            scene.add(obj72);
+
+
+            //obj = createBox("base_ponta_rect1_braco", -140, 145, 225, 0, 0, 0, 40, 10, 10, 0, "maroon", true);
+            //scene.add(obj);
+
+
+
+            //obj61 = createBox("base_ponta_quadrado3_braco", -165, 145, 200, 0, 0, 0, 10, 40, 40, 0, "maroon", true);
+            //scene.add(obj61);
+
+            //obj60 = createBox("base_ponta_quadrado4_braco", -195, 145, 200, 0, 0, 0, 10, 40, 40, 0, "maroon", true);
+            //scene.add(obj60);
+
+
+            obj = createBox("base_ponta_rect2_braco", -230, 145, 225, 0, 0, 0, 200, 10, 10, 0, "maroon", true);
+            scene.add(obj);
+
+
+            obj40 = createBox("base_ponta_braco1", -220, 134.5, 170, 0, 0, 0, 280, 19, 20, 0, "black", true);
+            scene.add(obj40);
+
+            obj41 = createBox("base_ponta_braco2", -220, 144.5, 170, 0, 0, 0, 280, 1, 20, 0, "red", true);
+            scene.add(obj41);
+
+            add_child(obj40, obj41);
+
+
+            //obj42 = createBox("base_ponta_sensor1", -340, 150, 170, 0, 0, 0, 10, 10, 20, 0, "darkorange", true);
+            //scene.add(obj42);
+
+            //obj43 = createBox("base_ponta_sensor2", -140, 150, 170, 0, 0, 0, 10, 10, 20, 0, "darkorange", true);
+            //scene.add(obj43);
+
+            obj70 = createBox("base_ponta_sensor3", -325, 150, 170, 0, 0, 0, 10, 10, 20, 0, "darkorange", true);
+            scene.add(obj70);
+
+
+            obj60 = createBox("base_ponta_quadrado4_braco", -325, 145, 200, 0, 0, 0, 10, 40, 40, 0, "maroon", true);
+            scene.add(obj60);
+
+            //add_child(obj40, obj42);
+            //add_child(obj40, obj43);
+            add_child(obj40, obj70);
+
+            pin1Sensor = createCylinder(
+                "pin1Sensor", 55, 165, 152, 0, 0, 0, 3, 30, 0, "darkblue", false);
+            scene.add(pin1Sensor);
+
+            pin2Sensor = createCylinder(
+                "pin2Sensor", 55, 165, 188, 0, 0, 0, 3, 30, 0, "darkblue", false);
+            scene.add(pin2Sensor);
+
+
+            obj = createBox("parede_transparente", 27, 202.5, 170, 0, 0, 0, 2.5, 105, 60, 0, "blue", true);
+            scene.add(obj);
+
+            lampada_led = createCylinder(
+                "lampada_led", 550, 130, 125, 0, 0, 0, 10, 10, 0, "darkgreen", false);
+            scene.add(lampada_led);
+
+
+        }//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        function createBox(name, px, py, pz, rx, ry, rz, sx, sy, sz, mass, _colour, isKeen) {
+            threeObject = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), new THREE.MeshPhongMaterial({ color: _colour }));
+            shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+            shape.setMargin(margin);
+            threeObject.position.set(px, py, pz);
+
+            threeObject.rotateX(rx);
+            threeObject.rotateY(ry);
+            threeObject.rotateZ(rz);
+
+            threeObjects[name] = threeObject;
+            threeObject.userData.name = name;
+
+            createRigidSolid(threeObject, shape, mass, isKeen);
+            return threeObject;
+        }
+
+
+
+        function createCylinder(name, px, py, pz, rx, ry, rz, radius, height, mass, _colour, isKeen) {
+
+            threeObject = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, height, 20, 1), new THREE.MeshPhongMaterial({ color: _colour }));
+            shape = new Ammo.btCylinderShape(new Ammo.btVector3(radius, height * 0.5, radius));
+            shape.setMargin(margin);
+            threeObject.position.set(px, py, pz);
+
+            threeObject.rotateX(rx);
+            threeObject.rotateY(ry);
+            threeObject.rotateZ(rz);
+
+            threeObjects[name] = threeObject;
+            threeObject.userData.name = name;
+
+            createRigidSolid(threeObject, shape, mass, isKeen);
+
+            threeObject.userData.physicsBody.setLinearVelocity(new Ammo.btVector3(0, 1, 0));
+
+            return threeObject;
+
+        }
+
+
+        function createRigidSolid(threeObject, shape, mass, isKeen) {
+
+            objects.push(threeObject);
+
+
+            localInertia = new Ammo.btVector3(0, 0, 0);
+            shape.calculateLocalInertia(mass, localInertia);
+            transform = new Ammo.btTransform();
+            transform.setIdentity();
+            pos = threeObject.position;
+
+            transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+
+            q = threeObject.quaternion;
+
+
+            transform.setRotation(new Ammo.btQuaternion(q.x, q.y, q.z, q.w));
+
+
+            motionState = new Ammo.btDefaultMotionState(transform);
+            rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, shape, localInertia);
+            body = new Ammo.btRigidBody(rbInfo);
+
+            body.setFriction(1);
+
+            body.setRestitution(0);
+
+            body.setActivationState(4);
+
+            threeObject.userData.physicsBody = body;
+            threeObject.receiveShadow = true;
+            threeObject.castShadow = true;
+
+
+
+
+            //threeObjects.push(threeObject);
+            if (isKeen === false) {
+                rigidBodies.push(threeObject);
+            }
+            physicsWorld.addRigidBody(body);
+        }
+
+
+        function initInput() {
+            window.addEventListener('mousedown', function (event) {
+                mouseCoords.set(
+                    (event.clientX / window.innerWidth) * 2 - 1,
+                    -(event.clientY / window.innerHeight) * 2 + 1
+                );
+                raycaster.setFromCamera(mouseCoords, camera);
+                // Creates a ball and throws it
+                var ballMass = 35;
+                var ballRadius = 2;
+                var ball = new THREE.Mesh(new THREE.SphereGeometry(ballRadius, 14, 10), ballMaterial);
+                ball.castShadow = true;
+                ball.receiveShadow = true;
+                var ballShape = new Ammo.btSphereShape(ballRadius);
+                ballShape.setMargin(margin);
+                pos.copy(raycaster.ray.direction);
+                pos.add(raycaster.ray.origin);
+                quat.set(0, 0, 0, 1);
+                var ballBody = createRigidBody(ball, ballShape, ballMass, pos, quat);
+                pos.copy(raycaster.ray.direction);
+                pos.multiplyScalar(200);
+                ballBody.setLinearVelocity(new Ammo.btVector3(pos.x, pos.y, pos.z));
+            }, false);
+        }
+
+
+
+        function initRaycasterIdentification() {
+            window.addEventListener('mousedown', function (event) {
+                // find intersections
+                mouseVector.x = 2 * (event.clientX / container.clientWidth) - 1;
+                mouseVector.y = 1 - 2 * (event.clientY / container.clientHeight);
+
+                //projector.unprojectVector(mouseVector, camera);
+
+
+                raycaster.setFromCamera(mouseVector, camera);
+
+
+
+                intersects = raycaster.intersectObjects(scene.children);
+
+
+                for (var i = 0; i < intersects.length; i++) {
+                    var intersection = intersects[i];
+                    var obj = intersection.object;
+
+                    if (typeof (obj.userData) != 'undefined')
+                        if (typeof (obj.userData.name) != 'undefined')
+                            console.log(obj.userData.name);
+                }
+
+            }, false);
+        }
+
+
+
+        function createObjectMaterial() {
+            var c = Math.floor(Math.random() * (1 << 24));
+            return new THREE.MeshPhongMaterial({ color: c });
+        }
+
+
+        function createRigidBody(object, physicsShape, mass, pos, quat, vel, angVel) {
+
+            if (pos) {
+                object.position.copy(pos);
+            } else {
+                pos = object.position;
+            }
+            if (quat) {
+                object.quaternion.copy(quat);
+            } else {
+                quat = object.quaternion;
+            }
+
+            var transform = new Ammo.btTransform();
+            transform.setIdentity();
+            transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
+            transform.setRotation(new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w));
+            var motionState = new Ammo.btDefaultMotionState(transform);
+
+            var localInertia = new Ammo.btVector3(0, 0, 0);
+            physicsShape.calculateLocalInertia(mass, localInertia);
+
+            var rbInfo = new Ammo.btRigidBodyConstructionInfo(mass, motionState, physicsShape, localInertia);
+            var body = new Ammo.btRigidBody(rbInfo);
+
+            body.setFriction(0.5);
+
+            if (vel) {
+                body.setLinearVelocity(new Ammo.btVector3(vel.x, vel.y, vel.z));
+            }
+            if (angVel) {
+                body.setAngularVelocity(new Ammo.btVector3(angVel.x, angVel.y, angVel.z));
+            }
+
+            object.userData.physicsBody = body;
+            object.userData.collided = false;
+
+            scene.add(object);
+
+            if (mass > 0) {
+                rigidBodies.push(object);
+
+                // Disable deactivation
+                body.setActivationState(4);
+            }
+
+            physicsWorld.addRigidBody(body);
+
+            return body;
+        }
+
+
+        function createParalellepipedWithPhysics(sx, sy, sz, mass, pos, quat, material) {
+
+            var object = new THREE.Mesh(new THREE.BoxGeometry(sx, sy, sz, 1, 1, 1), material);
+            var shape = new Ammo.btBoxShape(new Ammo.btVector3(sx * 0.5, sy * 0.5, sz * 0.5));
+            shape.setMargin(margin);
+
+            createRigidBody(object, shape, mass, pos, quat);
+
+            return object;
+
+        }
+
+
+
+
+        function onWindowResize() {
+
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+        }
+
+        function animate() {
+
+            requestAnimationFrame(animate);
+
+            render();
+            //stats.update();
+
+        }
+
+
+
+
+        function render() {
+
+            var deltaTime = clock.getDelta();
+
+
+
+            move_delta_linear(threeObjects["tubo_garra2"], 0, 0, delta_z1);
+            move_delta_linear(threeObjects["tubo_garra1"], 0, 0, delta_z2);
+            move_delta_linear(threeObjects["base_ponta_braco1"], delta_x1, 0, 0);
+
+
+            if (delta_left_station !== 0) {
+                for (var i = 0; i < left_station_rolos.length; i++) {
+                    rolo = left_station_rolos[i];
+                    move_delta_linear(rolo, delta_left_station, 0, 0);
+                    if (rolo.position.x < 72)
+                        rolo.position.x = 652;
+                    if (rolo.position.x > 652)
+                        rolo.position.x = 72;               
+                }
+               
+                for (var key in palletes) {
+               
+                    if (palletes.hasOwnProperty(key)) {
+                        if (palletes[key].position.x >= 70 && palletes[key].position.x <= 652 &&
+                            palletes[key].position.z < rolo.position.z + 30)
+                        {
+                            move_delta_linear(palletes[key], delta_left_station, 0, 0);
+                            palletes[key].userData.inConveyor = true;
+                          
+                        } else {
+                            palletes[key].userData.inConveyor = false;
+                        }
+                        
+                    }
+                }
+            }
+
+           
+
+
+
+
+            updateSensorPorts();
+            establish_actuator_states();
+
+
+            // seeClickedButtons();
+
+
+            updatePhysics(deltaTime);
+            controls.update();
+            renderer.render(scene, camera);
+
+            time += deltaTime;
+
+
+        }
+
+
+
+
+
+        function updatePhysics(deltaTime) { //possivelmente solução para fazer o attachment funcionar
+
+            // Step world
+            physicsWorld.stepSimulation(deltaTime, 10);
+
+            // Update rigid bodies
+
+            for (var i = 0, il = rigidBodies.length; i < il; i++) {
+                var objThree = rigidBodies[i];
+
+                var objPhys = objThree.userData.physicsBody;
+                var ms = objPhys.getMotionState();
+                if (ms) {
+                    ms.getWorldTransform(transformAux1);
+
+                    var p = transformAux1.getOrigin();
+                    var q = transformAux1.getRotation();
+
+                    variablexxxxx = objThree.userData.inConveyor;
+                    do_it = true;
+                    if (typeof variablexxxxx !== 'undefined' && variablexxxxx !== null && variablexxxxx === true) {
+                      //  do_it = false;
+                        // variable is undefined or null
+                        objThree.rotation.set(0, 0, 0);
+                        objThree.quaternion.set(0, 0, 0, 0);
+                    }
+
+                    if (do_it) {
+                        objThree.position.set(p.x(), p.y(), p.z());
+                        objThree.quaternion.set(q.x(), q.y(), q.z(), q.w());
+                    }
+
+                    objThree.userData.collided = false;
+                }
+            }
+        }
+
+
+        $('#buttonStation1').mousedown(function () {            
+            PORTS[1] = setBitValue(PORTS[1], 4, true);
+            buttonStation1Pressed = 1;
+        }).mouseup(function () {
+            //threeObjects["switch1"].material.color.setHex(base_color1);
+            PORTS[1] = setBitValue(PORTS[1], 4, false);
+            buttonStation1Pressed = 0;
+            });
+
+        $('#buttonStation2').mousedown(function () {
+            PORTS[1] = setBitValue(PORTS[1], 3, true);
+            buttonStation2Pressed = 1;
+        }).mouseup(function () {
+            //threeObjects["switch1"].material.color.setHex(base_color1);
+            PORTS[1] = setBitValue(PORTS[1], 3, false);
+            buttonStation2Pressed = 0;
+            });
+
+        $('#buttonStation3').mousedown(function () {
+            PORTS[1] = setBitValue(PORTS[1], 2, true);
+            buttonStation3Pressed = 1;
+        }).mouseup(function () {
+            //threeObjects["switch1"].material.color.setHex(base_color1);
+            PORTS[1] = setBitValue(PORTS[1], 2, false);
+            buttonStation3Pressed = 0;
+            });
+
+
+        
+        $('#buttonLED').mousedown(function () {
+            PORTS[2] = setBitValue(PORTS[2], 7, true);
+            buttonStation3Pressed = 1;
+        }).mouseup(function () {
+            //threeObjects["switch1"].material.color.setHex(base_color1);
+            PORTS[2] = setBitValue(PORTS[2], 7, false);
+            buttonStation3Pressed = 0;
+        });
+
+
+
+        $("#buttonConveyor").click(function () {
+
+            if (delta_left_station == 0 || delta_left_station == -SPEED) {
+                delta_left_station = SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 2, true);
+            }
+            else {
+                delta_left_station = 0;
+                PORTS[2] = setBitValue(PORTS[2], 2, false);
+            }
+        });
+
+
+        $("#buttonSTOP_ALL").click(function () {
+                PORTS[2] = 0;
+        });
+
+
+
+        function registerPallet(threePallete) {
+            //  scene.add(pallete);
+            palletes[palleteName] = pallete;
+        }
+
+
+        function createPallet(typeOfPallet) {
+            palleteCount++;
+            palleteName = "pallete" + palleteCount;
+            angles = [0, Math.PI / 2.0, Math.PI, 3.0 / 2.0 * Math.PI];
+            idx = Math.round(2*Math.random());
+            
+            pallete = createBox(palleteName, 0, 280, 170, 0, angles[idx], 0, 50, 20, 50, 0.1, 0xff9900, false);
+            pallete.userData.pin1 = null;
+            pallete.userData.pin2 = null;
+            pallete.userData.center = createCylinder(
+                palleteName + "_center", 0, 8, 0, 0, 0, 0, 5, 10, 0, "silver", false);
+            scene.add(pallete);
+            pallete.add(pallete.userData.center);
+
+            if (typeOfPallet === "B" || typeOfPallet === "C") {
+                pallete.userData.pin1 = createCylinder(
+                    palleteName + "_pin1", 18, 8, 18, 0, 0, 0, 3, 10, 0, "silver", false);
+                pallete.add(pallete.userData.pin1);
+
+
+            }
+            if (typeOfPallet == "C") {
+                pallete.userData.pin2 = createCylinder(
+                    palleteName + "_pin2", -18, 8, -18, 0, 0, 0, 3, 10, 0, "silver", false);
+
+                pallete.add(pallete.userData.pin2);
+            }
+
+            return pallete;
+        }
+
+        $("#buttonPieceA").click(function () {
+            pallete = createPallet("A");
+            registerPallet(pallete);
+        });
+
+        $("#buttonPieceB").click(function () {
+            pallete = createPallet("B");
+            registerPallet(pallete);
+        });
+
+        $("#buttonPieceC").click(function () {
+            pallete = createPallet("C");
+            registerPallet(pallete);
+        });
+
+
+        $("#deleteAll").click(function () {
+            for (var key in palletes) {
+                if (palletes.hasOwnProperty(key)) {
+                    scene.remove(palletes[key]);
+                    physicsWorld.removeRigidBody(palletes[key].userData.physicsBody);
+                    delete threeObjects[key];
+                    delete palletes[key];
+                }
+            }
+        });
+
+
+        $("#buttonCyllinderB_I").click(function () {
+            if (delta_z1 == 0 || delta_z1 == -B_SPEED) {
+                delta_z1 = B_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 4, true);
+                PORTS[2] = setBitValue(PORTS[2], 3, false);
+            }
+            else {
+                delta_z1 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 4, false);
+            }
+        });
+
+
+        $("#buttonCyllinderB_O").click(function () {
+            if (delta_z1 == 0 || delta_z1 == B_SPEED) {
+                delta_z1 = -B_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 3, true);
+                PORTS[2] = setBitValue(PORTS[2], 4, false);
+            }
+            else {
+                delta_z1 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 3, false);
+            }
+        });
+
+        $("#buttonCyllinderC_I").click(function () {
+            if (delta_z2 == 0 || delta_z2 == -C_SPEED) {
+                delta_z2 = C_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 6, true);
+                PORTS[2] = setBitValue(PORTS[2], 5, false);
+            }
+            else {
+                delta_z2 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 6, false);
+            }
+        });
+
+
+        $("#buttonCyllinderC_O").click(function () {
+            if (delta_z2 == 0 || delta_z2 == C_SPEED) {
+                delta_z2 = -C_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 5, true);
+                PORTS[2] = setBitValue(PORTS[2], 6, false);
+            }
+            else {
+                delta_z2 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 5, false);
+            }
+        });
+
+
+        $("#buttonCyllinderA_I").click(function () {
+            if (delta_x1 == 0 || delta_x1 == -A_SPEED) {
+                delta_x1 = A_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 1, true);
+                PORTS[2] = setBitValue(PORTS[2], 0, false);
+            }
+            else {
+                delta_x1 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 1, false);
+            }
+        });
+
+
+        $("#buttonCyllinderA_O").click(function () {
+            if (delta_x1 == 0 || delta_x1 == A_SPEED) {
+                delta_x1 = -A_SPEED;
+                PORTS[2] = setBitValue(PORTS[2], 0, true);
+                PORTS[2] = setBitValue(PORTS[2], 1, false);
+            }
+            else {
+                delta_x1 = 0;
+                PORTS[2] = setBitValue(PORTS[2], 0, false);
+            }
+        });
+
+
+
+
+
+
+
+
+        $("#SPEED").focusout(function () {
+            setSpeed();
+        });
+
+        $('#SPEED').on('keypress', function (e) {
+            if (e.which === 13) {
+                setSpeed();
+            }
+        });
+
+        $(document).on('input', '#speedRange', function () {
+            $('#SPEED').val($("#speedRange").val());
+            setSpeed();
+            // console.log($("#speedRange").val()  );
+            // SPEED = $("#speedRange").val();
+        });
+
+
+        function setSpeed() {
+            var aux = Number($("#SPEED").val());
+            if (aux !== 'NaN') {
+                SPEED = aux;
+                $("#speedRange").val(SPEED);
+            }
+            //alert(SPEED);
+        }
+
+
+        //////////////////////////////////////////////////////////////SPEED DO CILINDRO A
+
+        $("#A_SPEED").focusout(function () {
+            setSpeedA();
+        });
+
+        $('#A_SPEED').on('keypress', function (e) {
+            if (e.which === 13) {
+                setSpeedA();
+            }
+        });
+
+        $(document).on('input', '#speedRangeA', function () {
+            $('#A_SPEED').val($("#speedRangeA").val());
+            setSpeedA();
+        });
+
+        function setSpeedA() {
+            var aux = Number($("#A_SPEED").val());
+            if (aux !== 'NaN') {
+                A_SPEED = aux;
+                delta_x1 = (delta_x1 < 0 ? -A_SPEED : A_SPEED) * (delta_x1!=0);
+                $("#speedRangeA").val(A_SPEED);
+            }
+        }
+
+        //////////////////////////////////////////////////////////////SPEED DO CILINDRO B
+
+        $("#B_SPEED").focusout(function () {
+            setSpeedB();
+        });
+
+        $('#B_SPEED').on('keypress', function (e) {
+            if (e.which === 13) {
+                setSpeedB();
+            }
+        });
+
+        $(document).on('input', '#speedRangeB', function () {
+            $('#B_SPEED').val($("#speedRangeB").val());
+            setSpeedB();
+        });
+
+        function setSpeedB() {
+            var aux = Number($("#B_SPEED").val());
+            if (aux !== 'NaN') {
+                B_SPEED = aux;                
+                delta_z1 = (delta_z1 < 0 ? -B_SPEED : B_SPEED) * (delta_z1 != 0);
+                $("#speedRangeB").val(B_SPEED);
+            }
+        }
+
+        //////////////////////////////////////////////////////////////SPEED DO CILINDRO C
+
+        $("#C_SPEED").focusout(function () {
+            setSpeedC();
+        });
+
+        $('#C_SPEED').on('keypress', function (e) {
+            if (e.which === 13) {
+                setSpeedC();
+            }
+        });
+
+        $(document).on('input', '#speedRangeC', function () {
+            $('#C_SPEED').val($("#speedRangeC").val());
+            setSpeedC();
+        });
+
+        function setSpeedC() {
+            var aux = Number($("#C_SPEED").val());
+            if (aux !== 'NaN') {
+                C_SPEED = aux;
+                delta_z2 = (delta_z2 < 0 ? -C_SPEED : C_SPEED) * (delta_z2 != 0);
+                $("#speedRangeC").val(C_SPEED);
+            }
+        }
+
+
+
+
+        function distance(obj1, obj2) {
+            /*
+            x = obj1.position.x - obj2.position.x;
+            y = obj1.position.y - obj2.position.y;
+            z = obj1.position.z - obj2.position.z;
+            */
+            scene.updateMatrixWorld();
+            position_obj1 = vector1.setFromMatrixPosition(obj1.matrixWorld);
+            position_obj2 = vector2.setFromMatrixPosition(obj2.matrixWorld);
+            //console.log("position_obj1.x=" + position_obj1.x);
+            //console.log("position_obj2.x=" + position_obj2.x);
+            x = position_obj1.x - position_obj2.x;
+            y = position_obj1.y - position_obj2.y;
+            z = position_obj1.z - position_obj2.z;
+            /*
+            x = obj1.matrixWorld.getPosition().x - obj2.matrixWorld.getPosition().x;
+            y = obj1.matrixWorld.getPosition().y - obj2.matrixWorld.getPosition().y;
+            z = obj1.matrixWorld.getPosition().z - obj2.matrixWorld.getPosition().z;
+            */
+            dist = Math.sqrt(x * x + y * y + z * z);
+            return dist;
+        }
+
+        function setBitValue(byteValue, bit, logicalLevel) {
+
+            if (logicalLevel === true) {
+                mask = 1 << bit;
+                result = byteValue | mask;
+            } else {
+                mask = ~(1 << bit);
+                result = byteValue & mask;
+            }
+            return result;
+        }
+
+
+
+        function updateSensorPorts() {
+
+            ppp = [-1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1]; // -1 is useless value
+            bbb = [-1, 0, 1, 2, 3, 4, 5, 6, 7, 0, 1]; // -1 is useless value
+
+            ppp = [-1, 2, 2, 2, 2, 1]; // -1 is useless value
+            bbb = [-1, 6, 4, 2, 0, 6]; // -1 is useless value
+
+            ppp = [-1, 2, 2, 2, 1, 1]; // -1 is useless value
+            bbb = [-1, 5, 3, 1, 7, 5]; // -1 is useless value
+
+
+
+            /*
+                        if (distance(obj60, obj42) < 35 + TOLERANCE)
+                            PORTS[0] = setBitValue(PORTS[0], 5, true);
+                        else
+                            PORTS[0] = setBitValue(PORTS[0], 5, false);
+
+
+                        if (distance(obj63, obj43) < 35 + TOLERANCE)
+                            PORTS[0] = setBitValue(PORTS[0], 6, true);
+                        else
+                            PORTS[0] = setBitValue(PORTS[0], 6, false);
+            */
+
+            if (distance(obj60, obj70) < 32 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 6, true);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 6, false);
+
+
+            if (distance(obj63, obj70) < 32 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 5, true);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 5, false);
+
+
+
+            if (distance(obj80, obj50) < 30 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 2, false);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 2, true);
+
+
+            if (distance(obj81, obj50) < 27 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 1, false);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 1, true);
+
+
+            if (distance(obj82, obj51) < 30 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 4, false);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 4, true);
+
+
+            if (distance(obj83, obj51) < 27 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 3, false);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 3, true);
+
+            /*
+            if (distance(obj83, obj51) < 27 + TOLERANCE)
+                PORTS[0] = setBitValue(PORTS[0], 3, false);
+            else
+                PORTS[0] = setBitValue(PORTS[0], 3, true);*/
+            //pin2Sensor
+
+            PORTS[1] = setBitValue(PORTS[1], 6, false);
+            PORTS[1] = setBitValue(PORTS[1], 7, false);
+            PORTS[1] = setBitValue(PORTS[1], 5, false);
+            PORTS[0] = setBitValue(PORTS[0], 0, false);
+            for (var key in palletes) {
+                //console.log(palletes[key]);
+                if (palletes.hasOwnProperty(key)) {
+                    dist_11 = 99999;
+                    dist_12 = 99999;
+                    dist_21 = 99999;
+                    dist_22 = 99999;
+
+                    dist_31 = 99999;
+
+                    dist_41 = 99999;
+
+
+                    if (palletes[key].userData.pin1 !== null) {
+                        //x = palletes[key].userData.pin1.matrixWorld.getPosition().x;
+                        //console.log("x="+x)
+                        //console.log("dist_11=" + (distance(palletes[key].userData.pin1, pin1Sensor)));
+                        //console.log("dist_12=" + (distance(palletes[key].userData.pin1, pin2Sensor)));
+                        dist_11 = distance(palletes[key].userData.pin1, pin1Sensor);
+                        dist_12 = distance(palletes[key].userData.pin1, pin2Sensor);
+
+                    }
+                    if (palletes[key].userData.pin2 !== null) {
+                        dist_21 = distance(palletes[key].userData.pin2, pin1Sensor);
+                        dist_22 = distance(palletes[key].userData.pin2, pin2Sensor);
+                    }
+
+                    if (palletes[key].userData.center !== null) {
+                        dist_31 = distance(palletes[key].userData.center, obj19);
+                        dist_41 = distance(palletes[key].userData.center, obj26);
+                    }
+                    //if (distance(palletes[key].userData.pin1, pin1Sensor))
+
+                    dist_pin1_sensor = Math.min(dist_11, dist_21);
+                    dist_pin2_sensor = Math.min(dist_12, dist_22);
+                    //console.log("dist_pin1_sensor=" + dist_pin1_sensor)
+                    //console.log("dist_pin2_sensor=" + dist_pin2_sensor)
+                    if (dist_pin1_sensor < 25 + TOLERANCE)
+                        PORTS[1] = setBitValue(PORTS[1], 6, true);
+                    
+
+                    if (dist_pin2_sensor < 25 + TOLERANCE)
+                        PORTS[1] = setBitValue(PORTS[1], 5, true);
+                    
+
+
+
+                    if (dist_31 < 20 + TOLERANCE)
+                        PORTS[0] = setBitValue(PORTS[0], 0, true);
+                   
+
+
+                    if (dist_41 < 20 + TOLERANCE)
+                        PORTS[1] = setBitValue(PORTS[1], 7, true);
+                  
+                }
+            }
+
+
+            /*
+                        if (distance(pin1Sensor, obj51) < 30 + SPEED + TOLERANCE)
+                            PORTS[0] = setBitValue(PORTS[0], 3, false);
+                        else
+                            PORTS[0] = setBitValue(PORTS[0], 3, true);
+            */
+            /*
+                       if (distance(pallete, obj19) < 30 + SPEED + TOLERANCE)
+                           PORTS[0] = setBitValue(PORTS[0], 7, true);
+                       else
+                           PORTS[0] = setBitValue(PORTS[0], 7, false);
+
+                       if (distance(pallete, obj26) < 30 + SPEED + TOLERANCE)
+                           PORTS[0] = setBitValue(PORTS[1], 0, true);
+                       else
+                           PORTS[0] = setBitValue(PORTS[1], 0, false);
+            */
+
+            update_all_sensors_colors();
+
+            $("#P0").val(toBinary(PORTS[0]));
+            $("#P1").val(toBinary(PORTS[1]));
+            $("#P2").val(toBinary(PORTS[2]));
+            $("#P3").val(toBinary(PORTS[3]));
+            $("#P4").val(toBinary(PORTS[4]));
+            $("#P5").val(toBinary(PORTS[5]));
+
+        }
+
+
+        //TEM TB UM BIT PORTO 2
+        function update_all_sensors_colors() {
+
+            update_sensor_color(threeObjects["base_ponta_quadrado1_braco"], PORTS[0] & 1 << 5, 1, 0xff3333, 0x800000);
+            update_sensor_color(threeObjects["base_ponta_quadrado4_braco"], PORTS[0] & 1 << 6, 1, 0xff3333, 0x800000);
+
+            update_sensor_color(threeObjects["station1sensor"], PORTS[1] & 1 << 3, 1, 0x4d94ff, 0x002966);
+            update_sensor_color(threeObjects["station2sensor"], PORTS[1] & 1 << 4, 1, 0x4d94ff, 0x002966);
+            update_sensor_color(threeObjects["station3sensor"], PORTS[1] & 1 << 2, 1, 0x4d94ff, 0x002966);
+
+            update_sensor_color(threeObjects["base_garra_sensor21"], PORTS[0] & 1 << 4, 0, 0x4d94ff, 0x002966);
+            update_sensor_color(threeObjects["base_garra_sensor22"], PORTS[0] & 1 << 3, 0, 0x4d94ff, 0x002966);
+            update_sensor_color(threeObjects["base_garra_sensor11"], PORTS[0] & 1 << 2, 0, 0x4d94ff, 0x002966);
+            update_sensor_color(threeObjects["base_garra_sensor12"], PORTS[0] & 1 << 1, 0, 0x4d94ff, 0x002966);
+
+            update_sensor_color(threeObjects["parafuso1parte1"], PORTS[0] & 1 << 0, 1, 0x70a9a9, 0x2f4f4f);
+            update_sensor_color(threeObjects["parafuso1parte2"], PORTS[0] & 1 << 0, 1, 0x70a9a9, 0x2f4f4f);
+            update_sensor_color(threeObjects["parafuso1parte3"], PORTS[0] & 1 << 0, 1, 0x70a9a9, 0x2f4f4f);
+
+            update_sensor_color(threeObjects["parafuso3parte1"], PORTS[1] & 1 << 7, 1, 0x70a9a9, 0x2f4f4f);
+            update_sensor_color(threeObjects["parafuso3parte2"], PORTS[1] & 1 << 7, 1, 0x70a9a9, 0x2f4f4f);
+            update_sensor_color(threeObjects["parafuso3parte3"], PORTS[1] & 1 << 7, 1, 0x70a9a9, 0x2f4f4f);
+            update_sensor_color(threeObjects["pin1Sensor"], PORTS[1] & 1 << 6, 1, 0xff3333, 0x800000);
+            update_sensor_color(threeObjects["pin2Sensor"], PORTS[1] & 1 << 5, 1, 0xff3333, 0x800000);
+
+            lampada_led
+            //
+            update_sensor_color(threeObjects["lampada_led"], PORTS[2] & 1 << 7, 1, 0x90EE90, 0x006400);
+        }
+
+
+        function update_sensor_color(threeObject, state_value, activation_level, active_color, inactive_color) {
+            if (activation_level === 0) {
+                if (state_value === 0)
+                    threeObject.material.color.setHex(active_color);
+                else
+                    threeObject.material.color.setHex(inactive_color);
+            }
+            if (activation_level === 1) {
+                if (state_value !== 0)
+                    threeObject.material.color.setHex(active_color);
+                else
+                    threeObject.material.color.setHex(inactive_color);
+            }
+
+
+        }
+
+
+        function startWorker() {
+            if (typeof (Worker) !== "undefined") {
+                if (typeof (the_worker) === "undefined") {
+                    the_worker = new Worker("js/theworker.js");
+                }
+                the_worker.onmessage = worker_event;
+                /*** fim post data *****/
+            } else {
+                //document.getElementById("result").innerHTML = "Sorry! No Web Worker support.";
+                console.log("Sorry! No Web Worker support.");
+            }
+        }
+
+
+        //http://localhost:8081/ajax_port_values?P0=0&P1=1&P2=2&P3=3&P4=4&P5=5
+        function worker_event(event) {
+            //console.log("manual=" + is_on_manual + "semaphore=" + smaphore_worker);
+            if (smaphore_worker == 1) {
+                smaphore_worker = 0;
+                $.post("ajax_port_values", {
+                    "P0": PORTS[0],
+                    "P1": PORTS[1],
+                    "P2": PORTS[2],
+                    "P3": PORTS[3],
+                    "P4": PORTS[4],
+                    "P5": PORTS[5]
+                }, function (data, status) {
+
+                    smaphore_worker = 1;
+                    //console.log(PORTS);
+                    if (is_on_manual == false) {
+                        registers = JSON.parse(data);
+                        // console.log(registers['P2']);
+
+                        //AQUI  IMPORTANTE <<<<------------------------------------------- IMPORTANTE
+                        PORTS[2] = registers['P2'];
+
+                    }
+
+
+                }).fail(function (error) {
+                    smaphore_worker = 1;
+                    console.log("here is the error: " + error);
+                });
+            }
+
+        }
+        function establish_actuator_states() {
+            //stop movement  on xx limits
+            P2 = PORTS[2];
+
+            delta_left_station = 0;
+            delta_z1 = 0;
+            delta_z2 = 0;
+            delta_x1 = 0;
+
+            if ((P2 & 1 << 2) !== 0) {
+                delta_left_station = SPEED;
+            }
+
+            if ((P2 & 1 << 4) !== 0) {
+                delta_z1 = B_SPEED;
+            }
+
+            if ((P2 & 1 << 3) !== 0) {
+                delta_z1 = -B_SPEED;
+            }
+
+            if ((P2 & 1 << 6) !== 0) {
+                delta_z2 = C_SPEED;
+            }
+
+            if ((P2 & 1 << 5) !== 0) {
+                delta_z2 = -C_SPEED;
+            }
+
+            if ((P2 & 1 << 1) !== 0) {
+                delta_x1 = A_SPEED;                
+            }
+
+            if ((P2 & 1 << 0) !== 0) {
+                delta_x1 = -A_SPEED;
+            }
+        }
+
+
+    </script>
+
+</body>
+</html>
