@@ -3,7 +3,6 @@
 ### Contexto Académico
 *   **Unidade Curricular:** Instrumentação e Medidas Elétricas
 *   **Ano Letivo:** 2023/2024
-*   **Classificação:** [Coloca aqui a tua nota, se a tiveres]
 
 Este projeto consistiu no desenvolvimento de um sistema ciber-físico completo para a medição, processamento e visualização remota do consumo de energia elétrica de uma carga monofásica.
 
