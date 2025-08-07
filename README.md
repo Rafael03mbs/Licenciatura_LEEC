@@ -1,4 +1,4 @@
-# Portfólio de Engenharia | Projetos da Licenciatura (FCT NOVA 2021-2025)
+# Portfólio de Engenharia | Projetos da Licenciatura (FCT NOVA)
 
 Bem-vindo ao meu portfólio! Este repositório agrega uma coleção dos meus projetos académicos mais relevantes desenvolvidos durante a Licenciatura em Engenharia Eletrotécnica e de Computadores.
 
