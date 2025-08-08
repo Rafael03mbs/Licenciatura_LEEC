@@ -10,7 +10,7 @@ Clique no nome de um projeto para explorar a sua descrição técnica detalhada.
 
 *   **[Medidor de Energia IoT com ESP32](./medidor_energia_iot_esp32/):** Sistema completo com hardware, firmware em C/C++ e cloud (ThingSpeak) para a monitorização de consumo elétrico em tempo real. **(Classificação: 16/20)**
 
-*   **[Gestor de Rede Agrícola (Prolog & Java)](./gestor_rede_agricola/):** Base de conhecimento e motor de inferência em Prolog para otimizar uma rede agrícola, com integração via MQTT e Java. **(Classificação: 15/20)**
+*   **[Gestor de Rede Agrícola (Prolog & Java)](./gestor_rede_agricola/):** Base de conhecimento e motor de inferência em Prolog para otimizar uma rede agrícola. **(Classificação: 15/20)**
 
 *   **[Estufa Inteligente (Frames & GOLOG)](./estufa_automatica/):** Modelação de uma estufa inteligente usando o paradigma de Frames em Prolog para controlo automático e adaptativo. **(Classificação: 17/20)**
 
