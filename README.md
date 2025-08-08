@@ -14,7 +14,7 @@ Clique no nome de um projeto para explorar a sua descrição técnica detalhada.
 
 *   **[Estufa Inteligente (Frames & GOLOG)](./estufa_automatica/):** Modelação de uma estufa inteligente usando o paradigma de Frames em Prolog para controlo automático e adaptativo. **(Classificação: 17/20)**
 
-*   **[Sistema de Gestão de Residência Universitária (C)](./residencia_universitaria/):** Aplicação de software com arquitetura modular em C para a gestão completa de uma residência. (Projeto de Algoritmos e Estruturas de Dados, **Classificação Prática: 14/20**)
+*   **[Sistema de Gestão de Residência Universitária (C)](./residencia_universitaria/):** Aplicação de software com arquitetura modular em C para a gestão completa de uma residência. (Projeto de Algoritmos e Estruturas de Dados, **Classificação: 14/20**)
 
 *   **[Controlo de Conveyor Industrial (Java & JNI)](./sistemas_tempo_real/controlo_do_conveyor_em_java/):** Sistema concorrente em Java para controlo de uma linha de montagem, com integração de hardware externo. **(Classificação: 16/20)**
 
